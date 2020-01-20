@@ -1,4 +1,5 @@
-# RL-RL
-## Reinforcement Learning Rocket League Bot
+# RL-RL: Reinforcement Learning Rocket League Bot
 
-## Cloned from: https://github.com/RLBot/RLBotPythonExample
+## Reinforcement Learning agent for the game Rocket League.
+
+## Framework from: https://github.com/RLBot/RLBotPythonExample
