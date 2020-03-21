@@ -2,23 +2,40 @@ import math
 
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
+from rlbot.utils.game_state_util import GameState, BallState, CarState, Physics, Vector3, Rotator, GameInfoState, BoostState
+
 
 from util.orientation import Orientation
 from util.vec import Vec3
 
-
 class MyBot(BaseAgent):
+    def reset_episode(self):
+        car_state = CarState(boost_amount=45,
+                             physics=Physics(location=Vector3(2048, -2560), rotation=Rotator(0, 0.75 * math.pi, 0),
+                                             angular_velocity=Vector3(0, 0, 0)))
+
+        ball_state = BallState(Physics(location=Vector3(0, 0, 92.75), velocity=Vector3(0, 0, 0),
+                                       angular_velocity=Vector3(0, 0, 0), rotation=Rotator(0, 0, 0)))
+        game_state = GameState(ball=ball_state, cars={self.index: car_state}, boosts={i: BoostState(0) for i in range(34)})
+        self.set_game_state(game_state)
+
 
     def initialize_agent(self):
         # This runs once before the bot starts up
         self.controller_state = SimpleControllerState()
+        self.reset_episode()
+        self.EPISODE_LAST_TIME_HIT = 0
+        self.InitialReset = False
+        self.ResetBoosts = False
 
     def get_output(self, packet: GameTickPacket) -> SimpleControllerState:
-        ball_location = Vec3(packet.game_ball.physics.location)
+        if packet.game_info.is_round_active and not self.InitialReset:
+            self.reset_episode()
+            self.InitialReset = True
 
+        ball_location = Vec3(packet.game_ball.physics.location)
         my_car = packet.game_cars[self.index]
         car_location = Vec3(my_car.physics.location)
-
         car_to_ball = ball_location - car_location
 
         # Find the direction of our car using the Orientation class
@@ -37,8 +54,13 @@ class MyBot(BaseAgent):
 
         self.controller_state.throttle = 1.0
         self.controller_state.steer = turn
+        self.controller_state.boost = True
 
         draw_debug(self.renderer, my_car, packet.game_ball, action_display)
+        last_hit = packet.game_ball.latest_touch.time_seconds
+        if last_hit != self.EPISODE_LAST_TIME_HIT:
+            self.EPISODE_LAST_TIME_HIT = packet.game_ball.latest_touch.time_seconds
+            self.reset_episode()
 
         return self.controller_state
 
