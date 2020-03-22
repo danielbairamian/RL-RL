@@ -16,7 +16,7 @@ class MyBot(BaseAgent):
 
         ball_state = BallState(Physics(location=Vector3(0, 0, 92.75), velocity=Vector3(0, 0, 0),
                                        angular_velocity=Vector3(0, 0, 0), rotation=Rotator(0, 0, 0)))
-        game_state = GameState(ball=ball_state, cars={self.index: car_state}, boosts={i: BoostState(0) for i in range(34)})
+        game_state = GameState(ball=ball_state, cars={self.index: car_state})
         self.set_game_state(game_state)
 
 
@@ -29,10 +29,15 @@ class MyBot(BaseAgent):
         self.ResetBoosts = False
 
     def get_output(self, packet: GameTickPacket) -> SimpleControllerState:
+        # initial reset
+        # after 3..2..1.. go, reset for the first time
+        # only run this once, and start RL algo after (initial spawn is random)
         if packet.game_info.is_round_active and not self.InitialReset:
             self.reset_episode()
             self.InitialReset = True
 
+        # starter code given to drive directly towards the ball
+        # keep it for now.
         ball_location = Vec3(packet.game_ball.physics.location)
         my_car = packet.game_cars[self.index]
         car_location = Vec3(my_car.physics.location)

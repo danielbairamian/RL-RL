@@ -1,7 +1,9 @@
 import subprocess
 import sys
+import os
 
 DEFAULT_LOGGER = 'rlbot'
+DISABLE_RENDERING = True
 
 if __name__ == '__main__':
 
@@ -24,6 +26,9 @@ if __name__ == '__main__':
         subprocess.call([sys.executable, "-m", "pip", "install", '-r', 'requirements.txt', '--upgrade', '--upgrade-strategy=eager'])
 
     try:
+        if DISABLE_RENDERING:
+            os.startfile("BakkesModInjector\BakkesMod.exe")
+
         if len(sys.argv) > 1 and sys.argv[1] == 'gui':
             from rlbot.gui.qt_root import RLBotQTGui
 
