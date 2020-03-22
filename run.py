@@ -3,7 +3,7 @@ import sys
 import os
 
 DEFAULT_LOGGER = 'rlbot'
-DISABLE_RENDERING = True
+DISABLE_RENDERING = False
 
 if __name__ == '__main__':
 

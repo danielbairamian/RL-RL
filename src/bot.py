@@ -52,16 +52,16 @@ class MyBot(BaseAgent):
         if steer_correction_radians > 0:
             # Positive radians in the unit circle is a turn to the left.
             turn = -1.0  # Negative value for a turn to the left.
-            action_display = "turn left"
         else:
             turn = 1.0
-            action_display = "turn right"
 
         self.controller_state.throttle = 1.0
         self.controller_state.steer = turn
         self.controller_state.boost = True
 
-        draw_debug(self.renderer, my_car, packet.game_ball, action_display)
+        # debugger if needed (keeping for now)
+        # draw_debug(self.renderer, my_car, packet.game_ball, action_display)
+
         last_hit = packet.game_ball.latest_touch.time_seconds
         if last_hit != self.EPISODE_LAST_TIME_HIT:
             self.EPISODE_LAST_TIME_HIT = packet.game_ball.latest_touch.time_seconds
