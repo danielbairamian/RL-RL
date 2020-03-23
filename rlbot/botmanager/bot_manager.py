@@ -5,6 +5,7 @@ import traceback
 from datetime import datetime, timedelta
 from urllib.parse import ParseResult as URL
 
+from src.bot import RLKickoffAgent
 from rlbot.agents.base_agent import BaseAgent, BOT_CONFIG_MODULE_HEADER, MAXIMUM_TICK_RATE_PREFERENCE_KEY
 from rlbot.botmanager.agent_metadata import AgentMetadata
 from rlbot.matchconfig.match_config import MatchConfig
@@ -201,6 +202,7 @@ class BotManager:
                     if frame_urgency > 0:
                         frame_urgency -= 1 / self.maximum_tick_rate_preference
 
+                    self.perform_obs()
                     self.perform_tick()
                     self.counter += 1
 
@@ -219,6 +221,9 @@ class BotManager:
 
         # If terminated, send callback
         self.termination_complete_event.set()
+
+    def perform_obs(self):
+        self.observe_agent(self.agent)
 
     def perform_tick(self):
         # Reload the Agent if it has been modified or if reload is requested from outside.
@@ -320,6 +325,9 @@ class BotManager:
         raise NotImplementedError
 
     def call_agent(self, agent: BaseAgent, agent_class):
+        raise NotImplementedError
+
+    def observe_agent(selfself, agent: RLKickoffAgent):
         raise NotImplementedError
 
     def get_game_time(self):

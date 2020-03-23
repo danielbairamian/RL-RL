@@ -23,8 +23,8 @@ class RLKickoffAgent(BaseAgent):
 
     def reset_states(self):
         self.controller_state = SimpleControllerState()
-        self.car_state = CarState()
-        self.previous_state = CarState()
+        self.car_state = self.default_octane_state()
+        self.next_state = self.default_ball_state()
 
     def reset_episode(self):
         # boost amout = 45 because boosts are turned off
@@ -114,5 +114,16 @@ class RLKickoffAgent(BaseAgent):
 
         return self.controller_state
 
-    def ObserveState(self):
-        print("Hi")
+    def ObserveState(self, packet: GameTickPacket):
+        if not packet.game_info.is_round_active:
+            return
+
+        self.next_state = self.get_car_state(packet)
+
+        print("===============================")
+
+        print(self.car_state.physics.location.x)
+        print(self.car_state.physics.location.y)
+
+        print(self.next_state.physics.location.x)
+        print(self.next_state.physics.location.y)

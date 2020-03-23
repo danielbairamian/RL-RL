@@ -1,6 +1,7 @@
 from time import sleep
 
 from rlbot.agents.base_agent import BaseAgent
+from src.bot import RLKickoffAgent
 from rlbot.botmanager.bot_manager import BotManager
 from rlbot.utils.logging_utils import get_logger
 from rlbot.utils.structures import ball_prediction_struct as bp
@@ -32,6 +33,9 @@ class BotManagerStruct(BotManager):
         field_info = gd.FieldInfoPacket()
         self.game_interface.update_field_info_packet(field_info)
         return field_info
+
+    def observe_agent(self, agent: RLKickoffAgent):
+        agent.ObserveState(self.game_tick_packet)
 
     def call_agent(self, agent: BaseAgent, agent_class):
         controller_input = agent.get_output(self.game_tick_packet)
