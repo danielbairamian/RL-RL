@@ -25,6 +25,9 @@ class RLKickoffAgent(BaseAgent):
         self.controller_state = SimpleControllerState()
         self.car_state = self.default_octane_state()
         self.next_state = self.default_ball_state()
+        self.Skip_First_Call = True
+        self.current_frames_skipped = 0
+
 
     def reset_episode(self):
         # boost amout = 45 because boosts are turned off
@@ -59,9 +62,13 @@ class RLKickoffAgent(BaseAgent):
         self.EPISODE_TIMER = 0
         # episodes last at most 3 seconds
         self.EPISODE_MAX_TIME = 3.0
-
+        # To make training consistent, skip the first 5 frames of each episodes
+        # This is to make sure that the packets have had time to catch up to the current episode
+        # as there's no way to control packets explicitly
+        self.SKIP_FIRST_X_FRAMES = 5
         # initial ball state, it won't move, no need to update it
         self.ball_state = self.default_ball_state()
+
 
 
     def get_car_state(self, packet):
@@ -86,14 +93,28 @@ class RLKickoffAgent(BaseAgent):
 
         return car_state
 
+    def Skip_Helper(self, current_time, packet):
+        if packet.game_info.is_round_active and not self.InitialReset:
+            self.reset_episode()
+            self.InitialReset = True
+            self.current_frames_skipped+= 1
+            self.EPISODE_TIMER = current_time
+
+        if self.InitialReset and self.Skip_First_Call:
+            self.current_frames_skipped += 1
+
+        if self.current_frames_skipped == self.SKIP_FIRST_X_FRAMES:
+            self.current_frames_skipped = 0
+            self.Skip_First_Call = False
+
     # take action
     def get_output(self, packet: GameTickPacket) -> SimpleControllerState:
         # initial reset
         # after 3..2..1.. go, reset for the first time
         # only run this once, and start RL algo after (initial spawn is random)
-        if packet.game_info.is_round_active and not self.InitialReset:
-            self.reset_episode()
-            self.InitialReset = True
+        current_time = packet.game_info.seconds_elapsed
+        # helper to skip frames for consistency
+        self.Skip_Helper(current_time, packet)
 
         self.car_state = self.get_car_state(packet)
 
@@ -105,7 +126,6 @@ class RLKickoffAgent(BaseAgent):
         self.controller_state.boost = True
 
         last_hit = packet.game_ball.latest_touch.time_seconds
-        current_time = packet.game_info.seconds_elapsed
         # if we hit the ball OR the episode timer ran out, reset
         if (last_hit != self.EPISODE_LAST_TIME_HIT) or ((current_time - self.EPISODE_TIMER) > self.EPISODE_MAX_TIME):
             self.EPISODE_LAST_TIME_HIT = packet.game_ball.latest_touch.time_seconds
@@ -115,15 +135,14 @@ class RLKickoffAgent(BaseAgent):
         return self.controller_state
 
     def ObserveState(self, packet: GameTickPacket):
-        if not packet.game_info.is_round_active:
+        if self.Skip_First_Call:
+            # print("*********************Skipping DansGame**************************")
             return
 
         self.next_state = self.get_car_state(packet)
 
-        print("===============================")
-
-        print(self.car_state.physics.location.x)
-        print(self.car_state.physics.location.y)
-
-        print(self.next_state.physics.location.x)
-        print(self.next_state.physics.location.y)
+        # print("===============================")
+        # print(self.car_state.physics.location.x)
+        # print(self.car_state.physics.location.y)
+        # print(self.next_state.physics.location.x)
+        # print(self.next_state.physics.location.y)
