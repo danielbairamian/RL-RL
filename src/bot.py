@@ -5,6 +5,7 @@ from rlbot.utils.structures.game_data_struct import GameTickPacket
 from rlbot.utils.game_state_util import GameState, BallState, CarState, Physics, Vector3, Rotator, GameInfoState, BoostState
 import copy
 import flatbuffers
+from util.vec import Vec3
 
 class RLKickoffAgent(BaseAgent):
 
@@ -27,6 +28,13 @@ class RLKickoffAgent(BaseAgent):
         self.next_state = self.default_ball_state()
         self.Skip_First_Call = True
         self.current_frames_skipped = 0
+
+
+    def get_distance_to_ball(self, ball_state):
+        ball_location = Vec3(ball_state.physics.location)
+        dist_to_ball = ball_location - self.car_state.physics.location
+        dist_to_ball = dist_to_ball.length()
+        return dist_to_ball
 
 
     def reset_episode(self):
@@ -68,6 +76,8 @@ class RLKickoffAgent(BaseAgent):
         self.SKIP_FIRST_X_FRAMES = 5
         # initial ball state, it won't move, no need to update it
         self.ball_state = self.default_ball_state()
+        self.dist = self.get_distance_to_ball(self.ball_state)
+        self.original_dist = copy.deepcopy(self.dist)
 
 
 
@@ -117,6 +127,7 @@ class RLKickoffAgent(BaseAgent):
         self.Skip_Helper(current_time, packet)
 
         self.car_state = self.get_car_state(packet)
+        self.dist = self.get_distance_to_ball(self.ball_state)
 
         # random turning for now
         turn = np.random.random()*2.0 - 1.0
@@ -124,6 +135,7 @@ class RLKickoffAgent(BaseAgent):
         self.controller_state.throttle = 1.0
         self.controller_state.steer = turn
         self.controller_state.boost = True
+
 
         last_hit = packet.game_ball.latest_touch.time_seconds
         # if we hit the ball OR the episode timer ran out, reset
@@ -134,14 +146,18 @@ class RLKickoffAgent(BaseAgent):
 
         return self.controller_state
 
+    def reward_function(self, exp_factor):
+        reward = -1*(math.pow((self.dist / self.original_dist), exp_factor))
+        return reward
     def ObserveState(self, packet: GameTickPacket):
         if self.Skip_First_Call:
-            # print("*********************Skipping DansGame**************************")
+            print("*********************Skipping DansGame**************************")
             return
 
+        print(self.dist)
+        print(self.reward_function(exp_factor=1.0))
         self.next_state = self.get_car_state(packet)
-
-        # print("===============================")
+        print("===============================")
         # print(self.car_state.physics.location.x)
         # print(self.car_state.physics.location.y)
         # print(self.next_state.physics.location.x)
