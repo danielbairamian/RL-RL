@@ -204,6 +204,7 @@ class BotManager:
 
                     self.perform_obs()
                     self.perform_tick()
+                    self.perform_SAC()
                     self.counter += 1
 
                 last_tick_game_time = tick_game_time
@@ -224,6 +225,9 @@ class BotManager:
 
     def perform_obs(self):
         self.observe_agent(self.agent)
+
+    def perform_SAC(self):
+        self.sac_agent(self.agent)
 
     def perform_tick(self):
         # Reload the Agent if it has been modified or if reload is requested from outside.
@@ -327,7 +331,10 @@ class BotManager:
     def call_agent(self, agent: BaseAgent, agent_class):
         raise NotImplementedError
 
-    def observe_agent(selfself, agent: RLKickoffAgent):
+    def observe_agent(self, agent: RLKickoffAgent):
+        raise NotImplementedError
+
+    def sac_agent(self, agent: RLKickoffAgent):
         raise NotImplementedError
 
     def get_game_time(self):

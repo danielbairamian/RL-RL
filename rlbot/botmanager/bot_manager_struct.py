@@ -37,6 +37,9 @@ class BotManagerStruct(BotManager):
     def observe_agent(self, agent: RLKickoffAgent):
         agent.ObserveState(self.game_tick_packet)
 
+    def sac_agent(self, agent: RLKickoffAgent):
+        agent.SAC_Update()
+
     def call_agent(self, agent: BaseAgent, agent_class):
         controller_input = agent.get_output(self.game_tick_packet)
         if controller_input is None:

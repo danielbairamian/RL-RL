@@ -4,8 +4,8 @@ from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
 from rlbot.utils.game_state_util import GameState, BallState, CarState, Physics, Vector3, Rotator, GameInfoState, BoostState
 import copy
-import flatbuffers
 from util.vec import Vec3
+from src.ml_dir.experience_replay_buffer import ExperienceReplay, ReplayBuffer
 
 class RLKickoffAgent(BaseAgent):
 
@@ -60,9 +60,16 @@ class RLKickoffAgent(BaseAgent):
         self.set_game_state(game_state)
         self.reset_states()
 
+        if len(self.replay_buffer.replay_buffer) != 0:
+            self.replay_buffer.replay_buffer[-1].done = True
+
+
 
     def initialize_agent(self):
         # This runs once before the bot starts up
+        self.replay_max_size = 500
+        self.replay_buffer = ReplayBuffer(self.replay_max_size)
+
         self.reset_episode()
         self.EPISODE_LAST_TIME_HIT = 0
         self.InitialReset = False
@@ -78,7 +85,6 @@ class RLKickoffAgent(BaseAgent):
         self.ball_state = self.default_ball_state()
         self.dist = self.get_distance_to_ball(self.ball_state)
         self.original_dist = copy.deepcopy(self.dist)
-
 
 
     def get_car_state(self, packet):
@@ -129,6 +135,10 @@ class RLKickoffAgent(BaseAgent):
         self.car_state = self.get_car_state(packet)
         self.dist = self.get_distance_to_ball(self.ball_state)
 
+        '''
+        Below is where the agent will set the controller state
+        which is the action to take in this case
+        '''
         # random turning for now
         turn = np.random.random()*2.0 - 1.0
 
@@ -149,16 +159,25 @@ class RLKickoffAgent(BaseAgent):
     def reward_function(self, exp_factor):
         reward = -1*(math.pow((self.dist / self.original_dist), exp_factor))
         return reward
+
     def ObserveState(self, packet: GameTickPacket):
         if self.Skip_First_Call:
-            print("*********************Skipping DansGame**************************")
             return
 
-        print(self.dist)
-        print(self.reward_function(exp_factor=1.0))
+        reward = self.reward_function(exp_factor=1.0)
+
         self.next_state = self.get_car_state(packet)
-        print("===============================")
-        # print(self.car_state.physics.location.x)
-        # print(self.car_state.physics.location.y)
-        # print(self.next_state.physics.location.x)
-        # print(self.next_state.physics.location.y)
+        experience_data = ExperienceReplay(
+            self.car_state,
+            self.controller_state,
+            self.next_state,
+            reward,
+            done=False)
+
+        self.replay_buffer.push(experience_data)
+
+    def SAC_Update(self):
+        buffer = self.replay_buffer
+        if len(buffer.replay_buffer) == 0:
+            return
+        last_exp = self.replay_buffer.replay_buffer[-1]
