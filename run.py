@@ -4,6 +4,7 @@ import os
 
 DEFAULT_LOGGER = 'rlbot'
 DISABLE_RENDERING = False
+ENABLE_LOCKSTEP = True
 
 if __name__ == '__main__':
 

@@ -1,10 +1,3 @@
-import math
-import numpy as np
-from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
-from rlbot.utils.structures.game_data_struct import GameTickPacket
-from rlbot.utils.game_state_util import GameState, BallState, CarState, Physics, Vector3, Rotator, GameInfoState, BoostState
-import copy
-
 class ExperienceReplay():
 
     def __init__(self, current_state, action, next_state, reward, done):

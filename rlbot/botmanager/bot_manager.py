@@ -4,6 +4,7 @@ import time
 import traceback
 from datetime import datetime, timedelta
 from urllib.parse import ParseResult as URL
+from run import ENABLE_LOCKSTEP
 
 from src.bot import RLKickoffAgent
 from rlbot.agents.base_agent import BaseAgent, BOT_CONFIG_MODULE_HEADER, MAXIMUM_TICK_RATE_PREFERENCE_KEY
@@ -181,6 +182,11 @@ class BotManager:
         self.load_agent()
 
         self.last_module_modification_time = self.check_modification_time(os.path.dirname(self.agent_class_file))
+
+        # Added this
+        # this makes sure the bot doesn't skip an input before next frame
+        # might need to remove this, should be useful for training consistency
+        self.match_config.enable_lockstep = ENABLE_LOCKSTEP
 
         # Run until main process tells to stop, or we detect Ctrl+C
         try:
