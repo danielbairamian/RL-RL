@@ -8,6 +8,8 @@ from util.vec import Vec3
 from src.ml_dir.experience_replay_buffer import ExperienceReplay, ReplayBuffer
 from src.ControllerVisualizer import Controller
 
+from run import CONTROLLER_VIZ
+
 class RLKickoffAgent(BaseAgent):
 
     def default_ball_state(self):
@@ -67,7 +69,8 @@ class RLKickoffAgent(BaseAgent):
 
 
     def initialize_agent(self):
-        self.controller_viz = Controller(1)
+        if CONTROLLER_VIZ:
+            self.controller_viz = Controller(1)
         # This runs once before the bot starts up
         self.replay_max_size = 500
         self.replay_buffer = ReplayBuffer(self.replay_max_size)
@@ -155,8 +158,8 @@ class RLKickoffAgent(BaseAgent):
             self.EPISODE_LAST_TIME_HIT = packet.game_ball.latest_touch.time_seconds
             self.EPISODE_TIMER = current_time
             self.reset_episode()
-
-        self.controller_viz.report(self.controller_state)
+        if CONTROLLER_VIZ:
+            self.controller_viz.report(self.controller_state)
         return self.controller_state
 
     def reward_function(self, exp_factor):
