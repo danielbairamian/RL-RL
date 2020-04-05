@@ -61,9 +61,12 @@ class Controller:
         #self.controller.LeftTrigger = int(controller_state.throttle * 255)
         #print(controller_state.steer)
         self.controller.LeftStickX = 32767 * controller_state.steer
+        self.controller.Buttons = 0
+        if(controller_state.boost):
+            self.controller.Buttons |= 1 << 12
 
         if(controller_state.jump):
-            self.controller.Buttons ^= 1 << 12
+            self.controller.Buttons |= 1 << 13
         result = self.bus.Report(self.CONTROLLER_NUM, self.controller.GetReport(), self.output_report)
 
 

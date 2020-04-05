@@ -7,4 +7,4 @@ echo Shutdown Complete
 echo.
 
 
-pause
+#pause
