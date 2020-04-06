@@ -1,4 +1,3 @@
-
 import time
 import clr
 from rlbot.agents.base_agent import SimpleControllerState
