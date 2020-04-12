@@ -55,6 +55,9 @@ https://spinningup.openai.com/en/latest/user/installation.html. Make sure the cl
 
 Simply follow the installation guide for openAI, and most requirements would be satisfied.
 
+If you're on windows, your spinningup installation might failed because of MPI. I included the exe file in the DriverInstaller folder.
+Simply run the msmpisetup.exe file and it should fix the error. Alternatively, you can download it from here: https://www.microsoft.com/en-us/download/details.aspx?id=57467 
+
 An additional requirement is clr, which can be installed using "pip install pythonnet".
 
 A requirement.txt file should be provided in the project for a simpler installation
@@ -80,7 +83,7 @@ To enable this, go to the run.py file in the main folder, and set DISABLE_RENDER
 - GamePadViewer: This is a third party application that allows to visualize the bot's action.
 I figured, what would be the point of making a bot that discovered game mechanics if we can't see them?
 GamePadViewer launches a local web application that renders a controller, which is mapped to the Bot ingame.
-The exe file is provided for this, however the executables in the DriverInstaller folder must be run
+The exe file is provided for this, however the ScpDriverInstaller.exe in the DriverInstaller folder must be run
 When the game is running, go to https://gamepadviewer.com/ and you should see the following:
 
 ![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/controller.png)
