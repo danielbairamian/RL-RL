@@ -55,7 +55,7 @@ https://spinningup.openai.com/en/latest/user/installation.html. Make sure the cl
 
 Simply follow the installation guide for openAI, and most requirements would be satisfied.
 
-If you're on windows, your spinningup installation might failed because of MPI. I included the exe file in the DriverInstaller folder.
+If you're on windows, your spinningup installation might fail because of MPI. I included the exe file in the DriverInstaller folder.
 Simply run the msmpisetup.exe file and it should fix the error. Alternatively, you can download it from here: https://www.microsoft.com/en-us/download/details.aspx?id=57467 
 
 An additional requirement is clr, which can be installed using "pip install pythonnet".
