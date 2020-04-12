@@ -83,7 +83,9 @@ To enable this, go to the run.py file in the main folder, and set DISABLE_RENDER
 - GamePadViewer: This is a third party application that allows to visualize the bot's action.
 I figured, what would be the point of making a bot that discovered game mechanics if we can't see them?
 GamePadViewer launches a local web application that renders a controller, which is mapped to the Bot ingame.
-The exe file is provided for this, however the ScpDriverInstaller.exe in the DriverInstaller folder must be run
+The exe file is provided for this, however the ScpDriverInstaller.exe in the DriverInstaller folder must be run once.
+
+
 When the game is running, go to https://gamepadviewer.com/ and you should see the following:
 
 ![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/controller.png)
