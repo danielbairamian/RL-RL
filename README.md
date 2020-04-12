@@ -100,7 +100,7 @@ In order to kill it, run the end_vis.bat file found at the root of the project.
 # Running the Bot
 
 Once everything is installed correctly, simply run the run.py file. Make sure Rocket League is closed before running,
-as RLBot launched the game with specific flags. You should see the game open with the bot playing
+as RLBot launches the game with specific flags. You should see the game open with the bot playing
 
 # Reinforcement Learning and Results
 
