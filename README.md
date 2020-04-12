@@ -13,7 +13,7 @@ The current goal is to teach various aspects of the game to an agent, in order t
 The first objective is to learn the fastest way to reach the ball when a round starts, known as kickoff.
 
 # Episodic Kickoffs
-![](https://github.com/danielbairamian/RL-RL/ReadmeMedia/episode.gif)
+![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/episode.gif)
 
 The episode for this task is defined as following:
 
@@ -25,7 +25,7 @@ The episode for this task is defined as following:
 
 ## Episodic Consistency
 
-In regular rocket league games, the car can spawn in a finite set of multiple positions for kickoff.
+In regular Rocket League games, the car can spawn in a finite set of multiple positions for kickoff.
 
 Useful information about this can be found on the RLBot Wiki: https://github.com/RLBot/RLBot/wiki/Useful-Game-Values
 
@@ -67,11 +67,10 @@ The following application are optional, and are not necessary to run my Bot:
 I included some 3rd party applications, for either quality or performance reasons:
 
 - BakkesMod: This is a third party application that allows to run RocketLeague with rendering turned off.
-This is useful if you want train the bot yourself. The exe file can be found here http://bakkesmod.com/, although
-it will be provided. Althrough an additional step is required for this: After installing BakkesMod, find the config.cfg
+This is useful if you want train the bot yourself. The exe file can be found here http://bakkesmod.com/. Althrough an additional step is required for this: After installing BakkesMod, find the config.cfg
 file, line 68, set cl_rendering_disabled to "1".  If done correctly, this is how the game should look when running without rendering:
 
-![](https://github.com/danielbairamian/RL-RL/ReadmeMedia/rendering_disabled.png)
+![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/rendering_disabled.png)
 
 To enable this, go to the run.py file in the main folder, and set DISABLE_RENDERING to True
 
@@ -81,9 +80,14 @@ GamwPadViewer launched a local web application that renders a controller, which 
 The exe file is provided for this, however the executables in the DriverInstaller folders must be run
 When the game is running, go to https://gamepadviewer.com/ and you should see the following:
 
-![](https://github.com/danielbairamian/RL-RL/ReadmeMedia/controller.png)
+![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/controller.png)
 
 To enable this, go to the run.py file in the main folder, and set CONTROLLER_VIZ to True.
+
+Note: If you decide to run the visualizer, and you kill the app, the visualizer will not stop running.
+As it emulates an XBox controller, it can interfere on your computer, and you must kill it.
+
+In order to kill it, run the end_vis.bat file found at the root of the project.
 
 # Running the Bot
 
