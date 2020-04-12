@@ -39,11 +39,11 @@ then disabled all boost pads. This has been done because all spawn positions hav
 
 # Installation guide
 
-## Game Requirement (Rl & RLBot)
+## Game Requirement (RL & RLBot)
 
 In order to run this project, obviously the first requirement is to own a legitimate copy of the Rocket League
 
-Installing RLBot is not necessary for this, as I have exposed the library and included in the project. This had to be
+Installing RLBot is not necessary for this project, as I have exposed the library and included in the project. This had to be
 done to change the main loop logic to integrate learning.
 
 ## Python Requirements
@@ -51,13 +51,16 @@ done to change the main loop logic to integrate learning.
 RLBot supports many languages, and for obvious reasons I'm using Python.
 
 I'm using the OpenAI spinningup library for the learning part of this, and most of the requirements are found there: 
-https://spinningup.openai.com/en/latest/user/installation.html
+https://spinningup.openai.com/en/latest/user/installation.html. Make sure the cloned repository is placed in the root of this project.
 
 Simply follow the installation guide for openAI, and most requirements would be satisfied.
 
 An additional requirement is clr, which can be installed using "pip install pythonnet".
 
 A requirement.txt file should be provided in the project for a simpler installation
+
+Note, as spinningup supports both Tensorflow and Pytorch, feel free to use whichever, but make sure you specify
+which one you're using, by changing the config file in "Spinningup/spinup/user_config.py"
 
 ## 3rd Party Requirements
 
@@ -76,15 +79,15 @@ To enable this, go to the run.py file in the main folder, and set DISABLE_RENDER
 
 - GamePadViewer: This is a third party application that allows to visualize the bot's action.
 I figured, what would be the point of making a bot that discovered game mechanics if we can't see them?
-GamwPadViewer launched a local web application that renders a controller, which is mapped to the Bot ingame.
-The exe file is provided for this, however the executables in the DriverInstaller folders must be run
+GamePadViewer launches a local web application that renders a controller, which is mapped to the Bot ingame.
+The exe file is provided for this, however the executables in the DriverInstaller folder must be run
 When the game is running, go to https://gamepadviewer.com/ and you should see the following:
 
 ![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/controller.png)
 
 To enable this, go to the run.py file in the main folder, and set CONTROLLER_VIZ to True.
 
-Note: If you decide to run the visualizer, and you kill the app, the visualizer will not stop running.
+Note: If you decide to run the visualizer, and you kill your simulation, the visualizer will not stop running.
 As it emulates an XBox controller, it can interfere on your computer, and you must kill it.
 
 In order to kill it, run the end_vis.bat file found at the root of the project.
