@@ -43,7 +43,7 @@ class RLKickoffAgent(BaseAgent):
         return dist_to_ball
 
 
-    def reset_episode(self):
+    def reset_episode(self, is_hit=False):
         # boost amout = 45 because boosts are turned off
         # and initial boost pad is given to the car
         # as it spawns with 33 boost and the small boost gives +12
@@ -66,8 +66,19 @@ class RLKickoffAgent(BaseAgent):
         self.set_game_state(game_state)
         self.reset_states()
 
+        '''
+        Only set the done signal if the bot actually hits the ball
+        Don't do it if he times out, as this could throw off learning
+        (Ignore done signal when hitting time horizon)
+        
+        I.E: Ignore termination conditions that do not depend on the agen't state
+        
+        This is also something that OpenAI SAC does, so added this for consistency and performance
+        '''
+
         if self.rbuffer.size != 0:
-            self.rbuffer.done_buf[self.last_obs_ptr] = True
+            if is_hit:
+                self.rbuffer.done_buf[self.last_obs_ptr] = True
 
     def initialize_agent(self):
         if CONTROLLER_VIZ:
@@ -158,10 +169,12 @@ class RLKickoffAgent(BaseAgent):
 
         last_hit = packet.game_ball.latest_touch.time_seconds
         # if we hit the ball OR the episode timer ran out, reset
-        if (last_hit != self.EPISODE_LAST_TIME_HIT) or ((current_time - self.EPISODE_TIMER) > self.EPISODE_MAX_TIME):
+        hit_check = last_hit != self.EPISODE_LAST_TIME_HIT
+        timeout_check = (current_time - self.EPISODE_TIMER) > self.EPISODE_MAX_TIME
+        if (hit_check) or (timeout_check):
             self.EPISODE_LAST_TIME_HIT = packet.game_ball.latest_touch.time_seconds
             self.EPISODE_TIMER = current_time
-            self.reset_episode()
+            self.reset_episode(is_hit=hit_check)
         if CONTROLLER_VIZ:
             self.controller_viz.report(self.controller_state)
         return self.controller_state
@@ -201,16 +214,15 @@ class RLKickoffAgent(BaseAgent):
         # batch_eps = self.rbuffer.sample_batch()
         # print(batch_eps)
 
-
-        # obs1 = self.rbuffer.obs1_buf[self.last_obs_ptr]
-        # act = self.rbuffer.acts_buf[self.last_obs_ptr]
-        # rew = self.rbuffer.rews_buf[self.last_obs_ptr]
-        # obs2 = self.rbuffer.obs2_buf[self.last_obs_ptr]
-        # done = self.rbuffer.done_buf[self.last_obs_ptr]
-        # print("==================================")
-        # print("State: ", obs1)
-        # print("Action: ", act)
-        # print("Reward: ", rew)
-        # print("State': ", obs2)
-        # print("Done: ", done)
+        obs1 = self.rbuffer.obs1_buf[self.last_obs_ptr]
+        act = self.rbuffer.acts_buf[self.last_obs_ptr]
+        rew = self.rbuffer.rews_buf[self.last_obs_ptr]
+        obs2 = self.rbuffer.obs2_buf[self.last_obs_ptr]
+        done = self.rbuffer.done_buf[self.last_obs_ptr]
+        print("==================================")
+        print("State: ", obs1)
+        print("Action: ", act)
+        print("Reward: ", rew)
+        print("State': ", obs2)
+        print("Done: ", done)
 
