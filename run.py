@@ -5,7 +5,7 @@ import os
 DEFAULT_LOGGER = 'rlbot'
 
 # Toggle to disable rendering
-DISABLE_RENDERING = True
+DISABLE_RENDERING = False
 # Toggle to disable lockstep (freeze game if RLBot is lagging)
 ENABLE_LOCKSTEP = True
 # Toggle to disable GamePadViewer (if on, run end_vis.dat manually after shutting off)

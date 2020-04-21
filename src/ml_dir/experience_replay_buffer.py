@@ -1,11 +1,49 @@
+import numpy as np
+
 class ExperienceReplay():
 
-    def __init__(self, current_state, action, next_state, reward, done):
+    def __init__(self, current_state, action, next_state, reward, norm_dist, done):
         self.current_state = current_state
         self.action = action
         self.next_state = next_state
         self.reward = reward
         self.done = done
+        self.norm_dist = norm_dist
+
+    def process_state(self, current=True):
+        if current:
+            state = self.current_state
+        else:
+            state = self.next_state
+        rotation = state.physics.rotation
+        velocity = state.physics.velocity
+        ang_vel  = state.physics.velocity
+        boost = state.boost_amount
+        jumped = 1 if state.jumped else -1
+        double_j = 1 if state.double_jumped else -1
+        dist = self.norm_dist
+
+        return rotation.roll, rotation.pitch, rotation.yaw, \
+               velocity.x, velocity.y, velocity.z, \
+               ang_vel.x, ang_vel.y, ang_vel.z, \
+               dist, boost, jumped, double_j
+
+    def process_action(self):
+        steer = self.action.steer
+        throttle = self.action.throttle
+        pitch = self.action.pitch
+        yaw = self.action.yaw
+        roll = self.action.roll
+        jump = 1 if self.action.jump else -1
+        boost = 1 if self.action.boost else -1
+        handbrake = 1 if self.action.handbrake else -1
+
+        return steer, throttle, \
+               roll, pitch, yaw, \
+               jump, boost, handbrake
+
+
+
 
 class ReplayBuffer():
     def __init__(self, max_size):
@@ -19,4 +57,14 @@ class ReplayBuffer():
 
     def clear(self):
         self.replay_buffer = []
+
+    def sample_batch(self, batch_size=32):
+        buff_size = len(self.replay_buffer)
+        sample_size = min(batch_size, buff_size)
+
+        idxs = np.random.randint(0, buff_size, size=sample_size)
+        batch = []
+        for i in idxs:
+            batch.append(self.replay_buffer[i])
+        return batch
 

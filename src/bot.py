@@ -6,8 +6,11 @@ from rlbot.utils.game_state_util import GameState, BallState, CarState, Physics,
 import copy
 from util.vec import Vec3
 from src.ml_dir.experience_replay_buffer import ExperienceReplay, ReplayBuffer
+from spinup.algos.tf1.sac.sac import ReplayBuffer as RBuffer
+from src.ml_dir.SAC import SoftActorCritic
 from src.ControllerVisualizer import Controller
-
+import pickle
+import json
 from run import CONTROLLER_VIZ
 
 class RLKickoffAgent(BaseAgent):
@@ -63,18 +66,20 @@ class RLKickoffAgent(BaseAgent):
         self.set_game_state(game_state)
         self.reset_states()
 
-        if len(self.replay_buffer.replay_buffer) != 0:
-            self.replay_buffer.replay_buffer[-1].done = True
-
-
+        if self.rbuffer.size != 0:
+            self.rbuffer.done_buf[self.last_obs_ptr] = True
 
     def initialize_agent(self):
         if CONTROLLER_VIZ:
             self.controller_viz = Controller(1)
         # This runs once before the bot starts up
         self.replay_max_size = 500
-        self.replay_buffer = ReplayBuffer(self.replay_max_size)
+        self.SAC_Agent = SoftActorCritic()
+        self.rbuffer = RBuffer(self.SAC_Agent.obs_dim,
+                               self.SAC_Agent.act_dim,
+                               self.replay_max_size)
 
+        self.last_obs_ptr = self.rbuffer.ptr
         self.reset_episode()
         self.EPISODE_LAST_TIME_HIT = 0
         self.InitialReset = False
@@ -90,7 +95,6 @@ class RLKickoffAgent(BaseAgent):
         self.ball_state = self.default_ball_state()
         self.dist = self.get_distance_to_ball(self.ball_state)
         self.original_dist = copy.deepcopy(self.dist)
-
 
     def get_car_state(self, packet):
         car = packet.game_cars[self.index]
@@ -162,15 +166,15 @@ class RLKickoffAgent(BaseAgent):
             self.controller_viz.report(self.controller_state)
         return self.controller_state
 
-    def reward_function(self, exp_factor):
-        reward = -1*(math.pow((self.dist / self.original_dist), exp_factor))
+    def reward_function(self, dist, exp_factor):
+        reward = -1*(math.pow(dist, exp_factor))
         return reward
 
     def ObserveState(self, packet: GameTickPacket):
         if self.Skip_First_Call:
             return
-
-        reward = self.reward_function(exp_factor=1.0)
+        dist = self.dist / self.original_dist
+        reward = self.reward_function(dist, exp_factor=1.0)
 
         self.next_state = self.get_car_state(packet)
         experience_data = ExperienceReplay(
@@ -178,12 +182,35 @@ class RLKickoffAgent(BaseAgent):
             self.controller_state,
             self.next_state,
             reward,
+            dist,
             done=False)
 
-        self.replay_buffer.push(experience_data)
+        obs = experience_data.process_state(current=True)
+        act = experience_data.process_action()
+        rew = reward
+        obs2 = experience_data.process_state(current=False)
+        done = False
+
+        self.last_obs_ptr = self.rbuffer.ptr
+        self.rbuffer.store(obs, act, rew, obs2, done)
 
     def SAC_Update(self):
-        buffer = self.replay_buffer
-        if len(buffer.replay_buffer) == 0:
+        if self.rbuffer.size == 0:
             return
-        last_exp = self.replay_buffer.replay_buffer[-1]
+
+        # batch_eps = self.rbuffer.sample_batch()
+        # print(batch_eps)
+
+
+        # obs1 = self.rbuffer.obs1_buf[self.last_obs_ptr]
+        # act = self.rbuffer.acts_buf[self.last_obs_ptr]
+        # rew = self.rbuffer.rews_buf[self.last_obs_ptr]
+        # obs2 = self.rbuffer.obs2_buf[self.last_obs_ptr]
+        # done = self.rbuffer.done_buf[self.last_obs_ptr]
+        # print("==================================")
+        # print("State: ", obs1)
+        # print("Action: ", act)
+        # print("Reward: ", rew)
+        # print("State': ", obs2)
+        # print("Done: ", done)
+
