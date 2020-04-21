@@ -6,8 +6,6 @@ This is an attempt to make a reinforcement learning agent for the game Rocket Le
 
 This is done by using the RLBot framework: https://www.rlbot.org/
 
-This project is being done for McGill's Comp767: Reinforcement Learning
-
 The current goal is to teach various aspects of the game to an agent, in order to discover game mechanics.
 
 The first objective is to learn the fastest way to reach the ball when a round starts, known as kickoff.
