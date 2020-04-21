@@ -84,11 +84,10 @@ class RLKickoffAgent(BaseAgent):
         if CONTROLLER_VIZ:
             self.controller_viz = Controller(1)
         # This runs once before the bot starts up
-        self.replay_max_size = 500
         self.SAC_Agent = SoftActorCritic()
         self.rbuffer = RBuffer(self.SAC_Agent.obs_dim,
                                self.SAC_Agent.act_dim,
-                               self.replay_max_size)
+                               self.SAC_Agent.buffer_size)
 
         self.last_obs_ptr = self.rbuffer.ptr
         self.reset_episode()
@@ -219,10 +218,12 @@ class RLKickoffAgent(BaseAgent):
         rew = self.rbuffer.rews_buf[self.last_obs_ptr]
         obs2 = self.rbuffer.obs2_buf[self.last_obs_ptr]
         done = self.rbuffer.done_buf[self.last_obs_ptr]
-        print("==================================")
-        print("State: ", obs1)
-        print("Action: ", act)
-        print("Reward: ", rew)
-        print("State': ", obs2)
-        print("Done: ", done)
+
+        self.SAC_Agent.test()
+        # print("==================================")
+        # print("State: ", obs1)
+        # print("Action: ", act)
+        # print("Reward: ", rew)
+        # print("State': ", obs2)
+        # print("Done: ", done)
 

@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import os
+from src.ml_dir.SAC import SoftActorCritic
 
 DEFAULT_LOGGER = 'rlbot'
 
