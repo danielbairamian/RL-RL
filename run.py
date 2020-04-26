@@ -10,7 +10,7 @@ DISABLE_RENDERING = False
 # Toggle to disable lockstep (freeze game if RLBot is lagging)
 ENABLE_LOCKSTEP = True
 # Toggle to disable GamePadViewer (if on, run end_vis.dat manually after shutting off)
-CONTROLLER_VIZ = True
+CONTROLLER_VIZ = False
 
 if __name__ == '__main__':
 

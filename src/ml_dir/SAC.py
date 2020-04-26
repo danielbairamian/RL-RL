@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from spinningup.spinup.algos.tf1.sac import sac, core
-
+from rlbot.agents.base_agent import SimpleControllerState
 '''
 Based on OpenAI Spinning up SAC
 I need to close this and make it my own
@@ -47,6 +47,13 @@ Currently using everything except location (info encoded in distance)
 
 ==> State Space dim = 4 + 3 + 3 + 3 = 13
 '''
+
+def rand_to_bool(rand_num):
+    if rand_num < 0:
+        return False
+    else:
+        return True
+
 class MockGymEnv:
     def __init__(self, high):
         self.high = [high]
@@ -153,3 +160,26 @@ class SoftActorCritic():
         print(self.mu)
         print(self.pi_loss)
         print(self.logp_pi_next)
+
+    def train_step(self):
+        print("s")
+
+    def Sample_Random_Controller_State(self):
+
+        controller_state = SimpleControllerState()
+
+        controller_state.steer    = np.random.rand()*2 -1
+        controller_state.throttle = np.random.rand()*2 -1
+
+        controller_state.pitch = np.random.rand()*2 -1
+        controller_state.yaw   = np.random.rand()*2 -1
+        controller_state.roll  = np.random.rand()*2 -1
+
+        controller_state.jump      = rand_to_bool(np.random.rand()*2 -1)
+        controller_state.boost     = rand_to_bool(np.random.rand()*2 -1)
+        #controller_state.handbrake = rand_to_bool(np.random.rand()*2 -1)
+
+        return controller_state
+
+    def get_action(self, state):
+        return self.Sample_Random_Controller_State()

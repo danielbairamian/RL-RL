@@ -62,6 +62,21 @@ class SimpleControllerState:
         self.handbrake = handbrake
         self.use_item = use_item
 
+    def __str__(self):
+        s = ""
+        s += "steer: " + str(self.steer) + "\n"
+        s += "throttle: " + str(self.throttle) + "\n"
+
+        s += "roll: " + str(self.roll) + "\n"
+        s += "pitch: " + str(self.pitch) + "\n"
+        s += "yaw: " + str(self.yaw) + "\n"
+
+        s += "jump: " + str(self.jump) + "\n"
+        s += "boost: " + str(self.boost) + "\n"
+        s += "handbrake: " + str(self.handbrake) + "\n"
+        s += "use_item: " + str(self.use_item) + "\n"
+        return  s
+
 
 class BaseAgent:
     # the name of the bot fixed for any duplicates that may occur

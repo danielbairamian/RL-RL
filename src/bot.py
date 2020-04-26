@@ -159,12 +159,12 @@ class RLKickoffAgent(BaseAgent):
         which is the action to take in this case
         '''
         # random turning for now
-        turn = np.random.random()*2.0 - 1.0
-
-        self.controller_state.throttle = 1.0
-        self.controller_state.steer = turn
-        self.controller_state.boost = True
-
+        # turn = np.random.random()*2.0 - 1.0
+        #
+        # self.controller_state.throttle = 1.0
+        # self.controller_state.steer = turn
+        # self.controller_state.boost = True
+        self.controller_state = self.SAC_Agent.get_action(None)
 
         last_hit = packet.game_ball.latest_touch.time_seconds
         # if we hit the ball OR the episode timer ran out, reset
@@ -219,7 +219,7 @@ class RLKickoffAgent(BaseAgent):
         obs2 = self.rbuffer.obs2_buf[self.last_obs_ptr]
         done = self.rbuffer.done_buf[self.last_obs_ptr]
 
-        self.SAC_Agent.test()
+        #print(self.SAC_Agent.Sample_Random_Controller_State())
         # print("==================================")
         # print("State: ", obs1)
         # print("Action: ", act)
