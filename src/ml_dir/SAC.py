@@ -60,6 +60,8 @@ class MockGymEnv:
 
 class SoftActorCritic():
     def __init__(self):
+        self.steps_counter = 0
+
         self.seed = 0
         self.epochs = 100
         self.gamma = 0.99
@@ -164,6 +166,24 @@ class SoftActorCritic():
     def train_step(self):
         print("s")
 
+    def NN_To_Controller_State(self, nn_output):
+        controller_state = SimpleControllerState()
+
+        controller_state.steer    = nn_output[0]
+        controller_state.throttle = nn_output[1]
+
+        controller_state.pitch = nn_output[2]
+        controller_state.yaw   = nn_output[3]
+        controller_state.roll  = nn_output[4]
+
+        controller_state.jump      = rand_to_bool(nn_output[5])
+        controller_state.boost     = rand_to_bool(nn_output[6])
+        controller_state.handbrake = rand_to_bool(nn_output[7])
+
+        return controller_state
+
+
+
     def Sample_Random_Controller_State(self):
 
         controller_state = SimpleControllerState()
@@ -182,6 +202,19 @@ class SoftActorCritic():
         return controller_state
 
     def get_action(self, state):
-        #print(state)
-        # self.sess.run(self.mu, feed_dict={self.x_ph: state.reshape(1,-1)})[0])
-        return self.Sample_Random_Controller_State()
+        self.steps_counter += 1
+        if self.steps_counter > self.start_steps:
+            return self.NN_To_Controller_State(
+                self.sess.run(self.mu, feed_dict={self.x_ph: state.reshape(1,-1)})[0])
+        else:
+            return self.Sample_Random_Controller_State()
+
+    def train_batch(self, rbuffer):
+        batch = rbuffer.sample_batch(batch_size=self.batch_size)
+        feed_dict = {self.x_ph: batch['obs1'],
+                     self.x2_ph: batch['obs2'],
+                     self.a_ph: batch['acts'],
+                     self.r_ph: batch['rews'],
+                     self.d_ph: batch['done']}
+
+        outs = self.sess.run(self.step_ops, feed_dict)

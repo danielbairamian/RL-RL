@@ -207,12 +207,4 @@ class RLKickoffAgent(BaseAgent):
         if self.rbuffer.size == 0:
             return
 
-        # batch_eps = self.rbuffer.sample_batch()
-        # print(batch_eps)
-
-        obs1 = self.rbuffer.obs1_buf[self.last_obs_ptr]
-        act = self.rbuffer.acts_buf[self.last_obs_ptr]
-        rew = self.rbuffer.rews_buf[self.last_obs_ptr]
-        obs2 = self.rbuffer.obs2_buf[self.last_obs_ptr]
-        done = self.rbuffer.done_buf[self.last_obs_ptr]
-
+        self.SAC_Agent.train_batch(self.rbuffer)
