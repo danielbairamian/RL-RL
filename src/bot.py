@@ -5,7 +5,7 @@ from rlbot.utils.structures.game_data_struct import GameTickPacket
 from rlbot.utils.game_state_util import GameState, BallState, CarState, Physics, Vector3, Rotator, GameInfoState, BoostState
 import copy
 from util.vec import Vec3
-from src.ml_dir.experience_replay_buffer import ExperienceReplay, ReplayBuffer
+from src.ml_dir.experience_replay_buffer import ExperienceReplay, ReplayBuffer, process_state_static
 from spinup.algos.tf1.sac.sac import ReplayBuffer as RBuffer
 from src.ml_dir.SAC import SoftActorCritic
 from src.ControllerVisualizer import Controller
@@ -158,13 +158,10 @@ class RLKickoffAgent(BaseAgent):
         Below is where the agent will set the controller state
         which is the action to take in this case
         '''
-        # random turning for now
-        # turn = np.random.random()*2.0 - 1.0
-        #
-        # self.controller_state.throttle = 1.0
-        # self.controller_state.steer = turn
-        # self.controller_state.boost = True
-        self.controller_state = self.SAC_Agent.get_action(None)
+
+        current_obs = process_state_static(self.car_state, self.dist/self.original_dist)
+        action = self.SAC_Agent.get_action(np.asarray(current_obs, dtype=np.float32))
+        self.controller_state = self.SAC_Agent.get_action(np.asarray(current_obs, dtype=np.float32))
 
         last_hit = packet.game_ball.latest_touch.time_seconds
         # if we hit the ball OR the episode timer ran out, reset
@@ -218,12 +215,4 @@ class RLKickoffAgent(BaseAgent):
         rew = self.rbuffer.rews_buf[self.last_obs_ptr]
         obs2 = self.rbuffer.obs2_buf[self.last_obs_ptr]
         done = self.rbuffer.done_buf[self.last_obs_ptr]
-
-        #print(self.SAC_Agent.Sample_Random_Controller_State())
-        # print("==================================")
-        # print("State: ", obs1)
-        # print("Action: ", act)
-        # print("Reward: ", rew)
-        # print("State': ", obs2)
-        # print("Done: ", done)
 

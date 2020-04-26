@@ -177,9 +177,11 @@ class SoftActorCritic():
 
         controller_state.jump      = rand_to_bool(np.random.rand()*2 -1)
         controller_state.boost     = rand_to_bool(np.random.rand()*2 -1)
-        #controller_state.handbrake = rand_to_bool(np.random.rand()*2 -1)
+        controller_state.handbrake = rand_to_bool(np.random.rand()*2 -1)
 
         return controller_state
 
     def get_action(self, state):
+        #print(state)
+        # self.sess.run(self.mu, feed_dict={self.x_ph: state.reshape(1,-1)})[0])
         return self.Sample_Random_Controller_State()

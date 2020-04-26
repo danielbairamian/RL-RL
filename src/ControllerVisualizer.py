@@ -56,7 +56,7 @@ class Controller:
     def report(self, controller_state: SimpleControllerState):
 
         #print(controller_state.throttle)
-        self.controller.RightTrigger = int(controller_state.throttle * 255)
+        self.controller.RightTrigger = int(abs(controller_state.throttle) * 255)
         #self.controller.LeftTrigger = int(controller_state.throttle * 255)
         #print(controller_state.steer)
         self.controller.LeftStickX = 32767 * controller_state.steer

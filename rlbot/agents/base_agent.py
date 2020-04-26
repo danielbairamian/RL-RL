@@ -63,7 +63,7 @@ class SimpleControllerState:
         self.use_item = use_item
 
     def __str__(self):
-        s = ""
+        s: str = ""
         s += "steer: " + str(self.steer) + "\n"
         s += "throttle: " + str(self.throttle) + "\n"
 
@@ -75,7 +75,7 @@ class SimpleControllerState:
         s += "boost: " + str(self.boost) + "\n"
         s += "handbrake: " + str(self.handbrake) + "\n"
         s += "use_item: " + str(self.use_item) + "\n"
-        return  s
+        return s
 
 
 class BaseAgent:
