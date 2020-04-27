@@ -122,6 +122,8 @@ class SoftActorCritic():
         self.save_freq = 1000
         self.buffer_size = 5000
 
+        self.NN_Size = (512, 512, 256)
+
         self.obs_dim = 16
         self.act_dim = 8
         # all actions are clamped between -1 and 1
@@ -145,22 +147,22 @@ class SoftActorCritic():
         # Main outputs from computation graph
         with tf.variable_scope('main'):
             self.mu, self.pi, self.logp_pi, self.q1, self.q2 \
-                = core.mlp_actor_critic(self.x_ph, self.a_ph, action_space=self.MGE)
+                = core.mlp_actor_critic(self.x_ph, self.a_ph, action_space=self.MGE, hidden_sizes=self.NN_Size)
 
         with tf.variable_scope('main', reuse=True):
             # compose q with pi, for pi-learning
             _, _, _, self.q1_pi, self.q2_pi = \
-                core.mlp_actor_critic(self.x_ph, self.pi, action_space=self.MGE)
+                core.mlp_actor_critic(self.x_ph, self.pi, action_space=self.MGE, hidden_sizes=self.NN_Size)
 
             # get actions and log probs of actions for next states, for Q-learning
             _, self.pi_next, self.logp_pi_next, _, _ = \
-                core.mlp_actor_critic(self.x2_ph, self.a_ph, action_space=self.MGE)
+                core.mlp_actor_critic(self.x2_ph, self.a_ph, action_space=self.MGE, hidden_sizes=self.NN_Size)
 
         # Target value network
         with tf.variable_scope('target'):
             # target q values, using actions from *current* policy
             _, _, _, self.q1_targ, self.q2_targ = \
-                core.mlp_actor_critic(self.x2_ph, self.pi_next, action_space=self.MGE)
+                core.mlp_actor_critic(self.x2_ph, self.pi_next, action_space=self.MGE, hidden_sizes=self.NN_Size)
 
         # Min Double-Q:
         self.min_q_pi = tf.minimum(self.q1_pi, self.q2_pi)
