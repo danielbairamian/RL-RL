@@ -45,7 +45,10 @@ self.double_jumped = double_jumped           Bool
 State Space dim --> 4 + Physics (Subject to change on what physics uses)
 Currently using everything except location (info encoded in distance)
 
+Update #1 , added back location
+
 ==> State Space dim = 4 + 3 + 3 + 3 = 13
+        + locaiton (3) = 16
 '''
 
 
@@ -112,14 +115,14 @@ class SoftActorCritic():
         self.polyak = 0.995
         self.lr = 1e-3
         self.alpha = 0.2
-        self.batch_size = 100
-        self.start_steps = 10000
+        self.batch_size = 500
+        self.start_steps = 100000
         self.update_after = 1000
-        self.update_every = 50
+        self.update_every = 200
         self.save_freq = 1000
-        self.buffer_size = 500
+        self.buffer_size = 5000
 
-        self.obs_dim = 13
+        self.obs_dim = 16
         self.act_dim = 8
         # all actions are clamped between -1 and 1
         # Discrete boolean actions will be treated as continuous
@@ -255,8 +258,9 @@ class SoftActorCritic():
                 self.update_net = True
                 self.update_counter = 0
 
-
     def get_action(self, state, is_grounded, is_timedout):
+
+        self.update_flags()
         if self.stop_random:
             action = self.NN_To_Controller_State(
                 self.sess.run(self.pi, feed_dict={self.x_ph: state.reshape(1,-1)})[0])

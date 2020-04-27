@@ -1,6 +1,7 @@
 import numpy as np
 
 def process_state_static(state, dist_norm):
+    location = state.physics.location
     rotation = state.physics.rotation
     velocity = state.physics.velocity
     ang_vel = state.physics.velocity
@@ -9,7 +10,8 @@ def process_state_static(state, dist_norm):
     double_j = 1 if state.double_jumped else -1
     dist = dist_norm
 
-    return rotation.roll, rotation.pitch, rotation.yaw, \
+    return location.x, location.y, location.z, \
+           rotation.roll, rotation.pitch, rotation.yaw, \
            velocity.x, velocity.y, velocity.z, \
            ang_vel.x, ang_vel.y, ang_vel.z, \
            dist, boost, jumped, double_j
@@ -31,15 +33,17 @@ class ExperienceReplay():
             state = self.current_state
         else:
             state = self.next_state
+        location = state.physics.location
         rotation = state.physics.rotation
         velocity = state.physics.velocity
-        ang_vel  = state.physics.velocity
+        ang_vel  = state.physics.angular_velocity
         boost = state.boost_amount
         jumped = 1 if state.jumped else -1
         double_j = 1 if state.double_jumped else -1
         dist = self.norm_dist
 
-        return rotation.roll, rotation.pitch, rotation.yaw, \
+        return location.x, location.y, location.z, \
+               rotation.roll, rotation.pitch, rotation.yaw, \
                velocity.x, velocity.y, velocity.z, \
                ang_vel.x, ang_vel.y, ang_vel.z, \
                dist, boost, jumped, double_j
