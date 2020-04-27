@@ -94,7 +94,8 @@ class RLKickoffAgent(BaseAgent):
         self.ResetBoosts = False
         self.EPISODE_TIMER = 0
         # episodes last at most 3 seconds
-        self.EPISODE_MAX_TIME = 3.0
+        # self.EPISODE_MAX_TIME = 3.0
+        self.EPISODE_MAX_TIME = 10.0
         # To make training consistent, skip the first 5 frames of each episodes
         # This is to make sure that the packets have had time to catch up to the current episode
         # as there's no way to control packets explicitly

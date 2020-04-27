@@ -104,6 +104,7 @@ class MockGymEnv:
 class SoftActorCritic():
     def __init__(self):
         self.steps_counter = 0
+        self.update_counter = 0
 
         self.seed = 0
         self.epochs = 100
@@ -112,7 +113,7 @@ class SoftActorCritic():
         self.lr = 1e-3
         self.alpha = 0.2
         self.batch_size = 100
-        self.start_steps = 1000
+        self.start_steps = 10000
         self.update_after = 1000
         self.update_every = 50
         self.save_freq = 1000
@@ -125,6 +126,10 @@ class SoftActorCritic():
         # Then clamped to either -1 (False) or 1 (True)
         self.act_high = 1
         self.act_low  = -1
+
+        self.stop_random = False
+        self.start_train = False
+        self.update_net = False
 
         # ML Inits
         tf.set_random_seed(self.seed)
@@ -200,15 +205,6 @@ class SoftActorCritic():
         self.sess.run(tf.global_variables_initializer())
         self.sess.run(self.target_init)
 
-    def test(self):
-        print(self.x_ph)
-        print(self.mu)
-        print(self.pi_loss)
-        print(self.logp_pi_next)
-
-    def train_step(self):
-        print("s")
-
     def NN_To_Controller_State(self, nn_output):
         controller_state = SimpleControllerState()
 
@@ -242,9 +238,26 @@ class SoftActorCritic():
 
         return controller_state
 
+    def update_flags(self):
+
+        if not (self.stop_random and self.start_train):
+            self.steps_counter += 1
+        if (self.steps_counter > self.start_steps) and not self.stop_random:
+            print("Stopped random sampling")
+            self.stop_random = True
+        if (self.steps_counter > self.update_after) and  not self.start_train:
+            print("Started training")
+            self.start_train = True
+
+        if self.start_train:
+            self.update_counter += 1
+            if self.update_counter % self.update_every == 0:
+                self.update_net = True
+                self.update_counter = 0
+
+
     def get_action(self, state, is_grounded, is_timedout):
-        self.steps_counter += 1
-        if self.steps_counter > self.start_steps:
+        if self.stop_random:
             action = self.NN_To_Controller_State(
                 self.sess.run(self.pi, feed_dict={self.x_ph: state.reshape(1,-1)})[0])
             return action_mask(action, state, is_grounded, is_timedout)
@@ -253,12 +266,14 @@ class SoftActorCritic():
             return action_mask(action, state, is_grounded, is_timedout)
 
     def train_batch(self, rbuffer):
-        batch = rbuffer.sample_batch(batch_size=self.batch_size)
-        feed_dict = {self.x_ph: batch['obs1'],
+        if self.start_train:
+            if self.update_net:
+                batch = rbuffer.sample_batch(batch_size=self.batch_size)
+                feed_dict = {self.x_ph: batch['obs1'],
                      self.x2_ph: batch['obs2'],
                      self.a_ph: batch['acts'],
                      self.r_ph: batch['rews'],
                      self.d_ph: batch['done']}
 
-        outs = self.sess.run(self.step_ops, feed_dict)
-
+                outs = self.sess.run(self.step_ops, feed_dict)
+                self.update_net = False
