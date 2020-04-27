@@ -4,7 +4,7 @@ def process_state_static(state, dist_norm):
     location = state.physics.location
     rotation = state.physics.rotation
     velocity = state.physics.velocity
-    ang_vel = state.physics.velocity
+    ang_vel = state.physics.angular_velocity
     boost = state.boost_amount
     jumped = 1 if state.jumped else -1
     double_j = 1 if state.double_jumped else -1
