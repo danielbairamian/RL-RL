@@ -76,9 +76,9 @@ def action_mask(action, state, is_grounded, is_timedout):
         action.boost = False
 
     # car has jumped
-    if state[14] == 0:
+    if state[14] == 1:
         # car has double jumped
-        if state[15] == 0:
+        if state[15] == 1:
             action.jump = False
         # car hasn't double jumped
         # need to check for air timer timeout
@@ -92,8 +92,8 @@ def action_mask(action, state, is_grounded, is_timedout):
     return action
 
 
-def rand_to_bool(rand_num):
-    if rand_num < 0:
+def rand_to_bool(rand_num, thresh=0):
+    if rand_num < thresh:
         return False
     else:
         return True
@@ -226,20 +226,25 @@ class SoftActorCritic():
 
         return controller_state
 
-    def Sample_Random_Controller_State(self):
+    def Sample_Random_Controller_State(self, has_jumped):
 
         controller_state = SimpleControllerState()
 
-        controller_state.steer    = np.random.rand()*2 -1
-        controller_state.throttle = np.random.rand()*2 -1
+        controller_state.steer    = (np.random.rand()*2) -1
+        controller_state.throttle = 1.0 # (np.random.rand()*2) -1
 
-        controller_state.pitch = np.random.rand()*2 -1
-        controller_state.yaw   = np.random.rand()*2 -1
-        controller_state.roll  = np.random.rand()*2 -1
+        controller_state.pitch = (np.random.rand()*2) -1
+        controller_state.yaw   = (np.random.rand()*2) -1
+        controller_state.roll  = (np.random.rand()*2) -1
 
-        controller_state.jump      = rand_to_bool(np.random.rand()*2 -1)
-        controller_state.boost     = rand_to_bool(np.random.rand()*2 -1)
-        controller_state.handbrake = rand_to_bool(np.random.rand()*2 -1)
+        jump_roll = (np.random.rand()*2) -1
+        if has_jumped == 1.0:
+            controller_state.jump = rand_to_bool(jump_roll)
+        else:
+            controller_state.jump = rand_to_bool(jump_roll, thresh=0.99)
+
+        controller_state.boost     = rand_to_bool((np.random.rand()*2) -1)
+        controller_state.handbrake = rand_to_bool((np.random.rand()*2) -1)
 
         return controller_state
 
@@ -268,12 +273,13 @@ class SoftActorCritic():
                 self.sess.run(self.pi, feed_dict={self.x_ph: state.reshape(1,-1)})[0])
             return action_mask(action, state, is_grounded, is_timedout)
         else:
-            action = self.Sample_Random_Controller_State()
+            action = self.Sample_Random_Controller_State(has_jumped=state[14])
             return action_mask(action, state, is_grounded, is_timedout)
 
     def train_batch(self, rbuffer):
         if self.start_train:
             if self.update_net:
+                print("Updating Net")
                 batch = rbuffer.sample_batch(batch_size=self.batch_size)
                 feed_dict = {self.x_ph: batch['obs1'],
                      self.x2_ph: batch['obs2'],

@@ -77,6 +77,7 @@ class RLKickoffAgent(BaseAgent):
         if self.rbuffer.size != 0:
             if is_hit:
                 self.rbuffer.done_buf[self.last_obs_ptr] = True
+                self.rbuffer.rews_buf[self.last_obs_ptr] = 10
 
     def initialize_agent(self):
         if CONTROLLER_VIZ:
