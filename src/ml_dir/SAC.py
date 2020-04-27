@@ -54,9 +54,9 @@ Update #1 , added back location
 
 def action_mask(action, state, is_grounded, is_timedout):
     """
-    state[10] = boost amount
-    state[11] = jumped
-    state[12] = double jump
+    state[13] = boost amount
+    state[14] = jumped
+    state[15] = double jump
     """
 
     # car is on the ground
@@ -72,13 +72,13 @@ def action_mask(action, state, is_grounded, is_timedout):
         action.handbrake = 0.0
 
     # car is out of boost
-    if state[10] == 0:
+    if state[13] == 0:
         action.boost = False
 
     # car has jumped
-    if state[11] == 0:
+    if state[14] == 0:
         # car has double jumped
-        if state[12] == 0:
+        if state[15] == 0:
             action.jump = False
         # car hasn't double jumped
         # need to check for air timer timeout
@@ -115,7 +115,7 @@ class SoftActorCritic():
         self.polyak = 0.995
         self.lr = 1e-3
         self.alpha = 0.2
-        self.batch_size = 500
+        self.batch_size = 512
         self.start_steps = 100000
         self.update_after = 1000
         self.update_every = 200
