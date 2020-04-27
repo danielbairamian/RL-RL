@@ -48,15 +48,58 @@ Currently using everything except location (info encoded in distance)
 ==> State Space dim = 4 + 3 + 3 + 3 = 13
 '''
 
+
+def action_mask(action, state, is_grounded, is_timedout):
+    """
+    state[10] = boost amount
+    state[11] = jumped
+    state[12] = double jump
+    """
+
+    # car is on the ground
+    if is_grounded:
+        action.roll = 0.0
+        action.pitch = 0.0
+        action.yaw = 0.0
+
+    # car is in the air
+    else:
+        action.steer = 0.0
+        action.throttle = 0.0
+        action.handbrake = 0.0
+
+    # car is out of boost
+    if state[10] == 0:
+        action.boost = False
+
+    # car has jumped
+    if state[11] == 0:
+        # car has double jumped
+        if state[12] == 0:
+            action.jump = False
+        # car hasn't double jumped
+        # need to check for air timer timeout
+        # In rocket league, once a car jumped
+        # it has a limited time to perform a double jump
+        else:
+            if is_timedout:
+                action.jump = False
+
+
+    return action
+
+
 def rand_to_bool(rand_num):
     if rand_num < 0:
         return False
     else:
         return True
 
+
 class MockGymEnv:
     def __init__(self, high):
         self.high = [high]
+
 
 class SoftActorCritic():
     def __init__(self):
@@ -182,8 +225,6 @@ class SoftActorCritic():
 
         return controller_state
 
-
-
     def Sample_Random_Controller_State(self):
 
         controller_state = SimpleControllerState()
@@ -201,13 +242,15 @@ class SoftActorCritic():
 
         return controller_state
 
-    def get_action(self, state):
+    def get_action(self, state, is_grounded, is_timedout):
         self.steps_counter += 1
         if self.steps_counter > self.start_steps:
-            return self.NN_To_Controller_State(
-                self.sess.run(self.mu, feed_dict={self.x_ph: state.reshape(1,-1)})[0])
+            action = self.NN_To_Controller_State(
+                self.sess.run(self.pi, feed_dict={self.x_ph: state.reshape(1,-1)})[0])
+            return action_mask(action, state, is_grounded, is_timedout)
         else:
-            return self.Sample_Random_Controller_State()
+            action = self.Sample_Random_Controller_State()
+            return action_mask(action, state, is_grounded, is_timedout)
 
     def train_batch(self, rbuffer):
         batch = rbuffer.sample_batch(batch_size=self.batch_size)
@@ -218,3 +261,4 @@ class SoftActorCritic():
                      self.d_ph: batch['done']}
 
         outs = self.sess.run(self.step_ops, feed_dict)
+

@@ -9,8 +9,6 @@ from src.ml_dir.experience_replay_buffer import ExperienceReplay, ReplayBuffer, 
 from spinup.algos.tf1.sac.sac import ReplayBuffer as RBuffer
 from src.ml_dir.SAC import SoftActorCritic
 from src.ControllerVisualizer import Controller
-import pickle
-import json
 from run import CONTROLLER_VIZ
 
 class RLKickoffAgent(BaseAgent):
@@ -159,9 +157,17 @@ class RLKickoffAgent(BaseAgent):
         which is the action to take in this case
         '''
 
+        '''
+        Todo: properly calculate airial timeout
+        for now always false
+        '''
+
+        grounded = packet.game_cars[self.index].has_wheel_contact
+
         current_obs = process_state_static(self.car_state, self.dist/self.original_dist)
-        action = self.SAC_Agent.get_action(np.asarray(current_obs, dtype=np.float32))
-        self.controller_state = self.SAC_Agent.get_action(np.asarray(current_obs, dtype=np.float32))
+        self.controller_state = self.SAC_Agent.get_action(np.asarray(current_obs, dtype=np.float32),
+                                                          is_grounded= grounded,
+                                                          is_timedout=False)
 
         last_hit = packet.game_ball.latest_touch.time_seconds
         # if we hit the ball OR the episode timer ran out, reset

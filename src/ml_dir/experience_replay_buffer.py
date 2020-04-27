@@ -55,7 +55,7 @@ class ExperienceReplay():
         handbrake = 1 if self.action.handbrake else -1
 
         return steer, throttle, \
-               roll, pitch, yaw, \
+               pitch, yaw, roll, \
                jump, boost, handbrake
 
 
