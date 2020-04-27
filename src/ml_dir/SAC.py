@@ -279,7 +279,6 @@ class SoftActorCritic():
     def train_batch(self, rbuffer):
         if self.start_train:
             if self.update_net:
-                print("Updating Net")
                 batch = rbuffer.sample_batch(batch_size=self.batch_size)
                 feed_dict = {self.x_ph: batch['obs1'],
                      self.x2_ph: batch['obs2'],
