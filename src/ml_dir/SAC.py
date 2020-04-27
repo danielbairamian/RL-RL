@@ -109,6 +109,8 @@ class SoftActorCritic():
         self.steps_counter = 0
         self.update_counter = 0
 
+        self.reward_exp_factor = 0.3
+
         self.seed = 0
         self.epochs = 100
         self.gamma = 0.99
@@ -122,7 +124,7 @@ class SoftActorCritic():
         self.save_freq = 1000
         self.buffer_size = 5000
 
-        self.NN_Size = (512, 512, 256)
+        self.NN_Size = (64, 64)
 
         self.obs_dim = 16
         self.act_dim = 8

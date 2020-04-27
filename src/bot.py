@@ -191,7 +191,7 @@ class RLKickoffAgent(BaseAgent):
         if self.Skip_First_Call:
             return
         dist = self.dist / self.original_dist
-        reward = self.reward_function(dist, exp_factor=1.0)
+        reward = self.reward_function(dist, exp_factor=self.SAC_Agent.reward_exp_factor)
 
         self.next_state = self.get_car_state(packet)
         experience_data = ExperienceReplay(
