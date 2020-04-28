@@ -102,4 +102,6 @@ as RLBot launches the game with specific flags. You should see the game open wit
 
 # Reinforcement Learning and Results
 
-tbd
+At first, we randomly sample controller states for some amount of steps. This is an exploration phase which allows the agent to gather data
+
+<video src="https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/Random_Actions.mp4" width="320" height="200" controls preload></video>
