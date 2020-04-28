@@ -104,4 +104,18 @@ as RLBot launches the game with specific flags. You should see the game open wit
 
 At first, we randomly sample controller states for some amount of steps. This is an exploration phase which allows the agent to gather data
 
-<video src="https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/Random_Actions.mp4" width="320" height="200" controls preload></video>
+![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/random_act.gif)
+
+After some time spent learning, the bot begins to understand that gettings towards the ball is good
+
+![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/Hit_Miss.gif)
+
+Some other examples of it learning to go towards the ball
+
+![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/Hit_Slow.gif)
+
+Some episodes also show that the bot starts to rush to the ball, which is the expected behaviour of this task
+
+![](https://github.com/danielbairamian/RL-RL/blob/master/ReadmeMedia/Hit_Fast.gif)
+ 
+
