@@ -58,11 +58,6 @@ Simply run the msmpisetup.exe file and it should fix the error. Alternatively, y
 
 An additional requirement is clr, which can be installed using "pip install pythonnet".
 
-A requirement.txt file should be provided in the project for a simpler installation
-
-Note, as spinningup supports both Tensorflow and Pytorch, feel free to use whichever, but make sure you specify
-which one you're using, by changing the config file in "Spinningup/spinup/user_config.py"
-
 ## 3rd Party Requirements
 
 The following application are optional, and are not necessary to run my Bot:
