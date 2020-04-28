@@ -109,6 +109,3 @@ ENV/
 
 # Gradle files
 /.gradle
-
-#spinning up openai
-spinningup

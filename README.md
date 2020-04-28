@@ -16,7 +16,7 @@ The first objective is to learn the fastest way to reach the ball when a round s
 The episode for this task is defined as following:
 
 - The bot always starts from the same kickoff position
-- Once the episode starts, the bot will have 3 seconds to hit the ball
+- Once the episode starts, the bot will have a few seconds to hit the ball
 - The episode is done when either the bot hits the ball, or the timer runs out
 - The agent will always receive a negative reward at every step of the episode
 - The reward itself is scaled by the distance to the ball to incentivize rushing to the ball
